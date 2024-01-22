@@ -1,8 +1,7 @@
 import json
 import time 
-import requests
 import csv
-import calculate_best_team
+import requests
 
 #get form, current price, selected%, lastGW points, totalPoints, ICT, influence, create, threat, GW in, GW out, bonus points
 def create_table_all_player_all_stats():
@@ -48,5 +47,3 @@ def create_table_all_player_all_stats():
 
 
 create_table_all_player_all_stats()
-
-# calculate_best_team("C:\Users\dhruv\OneDrive\Desktop\Projects\fantasy-team\epl\data\23-24\player_stats.csv")

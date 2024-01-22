@@ -1,6 +1,7 @@
 ###read in the csv file to get all players###
+from cmath import inf
 import csv
-from pulp import LpProblem, LpVariable, lpSum, LpMaximize
+from pulp import LpProblem, LpVariable, LpInteger, LpStatus, lpSum, LpMaximize
 
 """
 how do we calculate the best possible team? a team has 2 GKs, 5 DEFs, 5 MIDs, 3 FWDs
@@ -17,20 +18,39 @@ def best_team():
     playerDict = {}
     with open(csvFilePath, 'r', newline='', encoding='utf-8') as csv_file:
         csv_reader = csv.DictReader(csv_file)
-        minGK=0 #get the cheapest GK
-        minFWD=0 #get the cheapest FWD
-        minDEF=0 #get the 2 cheapest DEFs
+        minGK=("",inf) #get the cheapest GK
+        minFWD=("",inf) #get the cheapest FWD
+        minDEF1=("",inf)
+        minDEF2=("",inf) #get the 2 cheapest DEFs
         budget=100
 
         for row in csv_reader:
             name = row["web_name"]
-            points = row["total_points"]
+            points = int(row["total_points"])
             cost = float(row["now_cost"])/10
             position = row["element_type"]
+            if position == "GK" and cost < minGK[1]:
+                minGK = (name,cost)
+            elif position == "FWD" and cost < minFWD[1]:
+                minFWD = (name,cost)
+            if position == "DEF" and cost < minDEF1[1]:
+                minDEF2 = minDEF1
+                minDEF1 = (name,cost)
+            elif position == "DEF" and cost < minDEF2[1]:
+                minDEF2 = (name,cost)
+            # this is pretty janky. look up how to use heapq to get the two smallest values
             playerDict[name] = [position, points, cost]
-
-    maximize_points(playerDict, 100)
-
+        playerDict.pop(minGK[0])
+        playerDict.pop(minFWD[0])
+        playerDict.pop(minDEF1[0])
+        playerDict.pop(minDEF2[0])
+        # get rid of all the min guys
+        budget=budget - minGK[1]-minFWD[1]-minDEF1[1]-minDEF2[1]
+    print(playerDict)
+    result = maximize_points(playerDict, budget)
+    # Print the selected players
+    for player in result:
+        print(f"Selected {player}: Position = {playerDict[player][0]}, Cost = {playerDict[player][2]}, Points = {playerDict[player][1]}")
 
 def maximize_points(players, budget_limit):
     positions = ["GK", "DEF", "MID", "FWD"]
@@ -40,7 +60,7 @@ def maximize_points(players, budget_limit):
     prob = LpProblem("MaximizePoints", LpMaximize)
 
     # Create binary decision variables for each player
-    player_vars = LpVariable.dicts("Player", players.keys(), 0, 1, LpVariable.integer)
+    player_vars = LpVariable.dicts("Player", players.keys(), 0, 1, cat=LpInteger)
 
     # Objective function: maximize total points
     prob += lpSum(player_vars[player] * players[player][1] for player in players), "TotalPoints"
@@ -59,29 +79,5 @@ def maximize_points(players, budget_limit):
     selected_players = [player for player in players if player_vars[player].value() == 1]
 
     return selected_players
-
-# Example usage:
-players = {
-    "Player1": ["GK", 30.0, 10.0],
-    "Player2": ["GK", 25.0, 8.0],
-    "Player3": ["DEF", 40.0, 15.0],
-    "Player4": ["DEF", 35.0, 12.0],
-    "Player5": ["DEF", 30.0, 10.0],
-    "Player6": ["MID", 50.0, 20.0],
-    "Player7": ["MID", 45.0, 18.0],
-    "Player8": ["MID", 40.0, 15.0],
-    "Player9": ["MID", 35.0, 12.0],
-    "Player10": ["MID", 30.0, 10.0],
-    "Player11": ["FWD", 60.0, 25.0],
-    "Player12": ["FWD", 55.0, 22.0],
-}
-
-budget_limit = 50.0  # Adjust as needed
-result = maximize_points(players, budget_limit)
-
-# Print the selected players
-for player in result:
-    print(f"Selected {player}: Position = {players[player][0]}, Cost = {players[player][2]}, Points = {players[player][1]}")
-
 
 best_team()
