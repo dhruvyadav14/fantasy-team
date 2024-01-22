@@ -23,7 +23,7 @@ def create_table_all_player_all_stats():
     position_map={1:"GK",2:"DEF",3:"MID",4:"FWD"}
 
     columns=["web_name", "team", "element_type", "form", "now_cost", "selected_by_percent", "event_points", "total_points", "ict_index", "influence", "creativity", "threat", "transfers_in", "transfers_out", "bonus"]
-    csvPath="C:/Users/dhruv/OneDrive/Desktop/Projects/fantasy-team/epl/data/23-24/players_stats.csv"
+    csvPath="C:/Users/dhruv/OneDrive/Desktop/Projects/fantasy-team/data/23-24/players_stats.csv"
     with open(csvPath, 'w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file)
         csv_writer.writerow(columns)

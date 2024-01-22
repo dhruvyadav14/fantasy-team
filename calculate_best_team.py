@@ -14,7 +14,7 @@ this is our new budget
 """
 
 def best_team():
-    csvFilePath="C:/Users/dhruv/OneDrive/Desktop/Projects/fantasy-team/epl/data/23-24/players_stats.csv"
+    csvFilePath="C:/Users/dhruv/OneDrive/Desktop/Projects/fantasy-team/data/23-24/players_stats.csv"
     playerDict = {}
     with open(csvFilePath, 'r', newline='', encoding='utf-8') as csv_file:
         csv_reader = csv.DictReader(csv_file)
