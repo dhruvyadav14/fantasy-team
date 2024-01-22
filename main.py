@@ -42,8 +42,5 @@ def create_table_all_player_all_stats():
 
     all_json_objects=json.dumps(all_data, indent=4)
 
-    with open("sample.json", 'w') as json_file:
-        json_file.write(all_json_objects)
-
 
 create_table_all_player_all_stats()
